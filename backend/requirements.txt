@@ -1,0 +1,17 @@
+fastapi
+uvicorn
+python-dotenv
+langchain
+langchain-google-genai
+langchain-community
+faiss-cpu
+sentence-transformers
+pypdf
+google-auth
+google-auth-oauthlib
+google-api-python-client
+groq
+python-multipart
+instaloader
+beautifulsoup4
+twilio

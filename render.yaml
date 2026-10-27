@@ -1,0 +1,41 @@
+services:
+  # ─── FastAPI Backend ───
+  - type: web
+    name: job-agent-backend
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: python main.py
+    plan: free
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: GROQ_API_KEY
+        sync: false
+      - key: YOUR_NAME
+        sync: false
+      - key: GMAIL_ADDRESS
+        sync: false
+      - key: YOUR_PHONE
+        sync: false
+      - key: GITHUB_URL
+        sync: false
+      - key: LINKEDIN_URL
+        sync: false
+      - key: PORTFOLIO_URL
+        sync: false
+
+  # ─── React Frontend ───
+  - type: web
+    name: job-agent-frontend
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./build
+    plan: free
+    envVars:
+      - key: REACT_APP_API_URL
+        fromService:
+          type: web
+          name: job-agent-backend
+          property: host

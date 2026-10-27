@@ -1,0 +1,23 @@
+# Python
+backend/venv/
+backend/__pycache__/
+backend/*.pyc
+
+# Secret files - NEVER push these
+backend/.env
+backend/credentials.json
+backend/token.pkl
+backend/token.json
+*.json.secret
+
+# Auto generated files
+
+
+
+# Frontend
+frontend/node_modules/
+frontend/build/
+
+# Windows
+Thumbs.db
+desktop.ini
