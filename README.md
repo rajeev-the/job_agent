@@ -337,11 +337,66 @@ This repository contains a pre-configured `render.yaml` blueprint:
 
 ---
 
+## 📑 Planner: Autonomous Custom Resume Generator (LaTeX & Google Docs)
+
+### 🎯 Overview
+An upcoming upgrade to Job Agent that transitions from selecting pre-existing static PDF resumes to **autonomous, dynamic resume synthesis**:
+1. **Input:** Only the Job Description (via link, text, PDF, or WhatsApp message).
+2. **Knowledge Vault:** Pulls verified career history, projects, and skills from a `master_profile.json` (100% truthful, zero hallucination).
+3. **AI Tailoring Engine (Groq Llama 3.3 70B):** Automatically prioritizes relevant skills, generates STAR/XYZ impact metrics matching the JD keywords, and enforces strict 1-page constraints.
+4. **Dual-Format Rendering:**
+   - **LaTeX (`.tex` $\rightarrow$ PDF):** Typeset using industry-standard ATS-friendly templates (via `tectonic` / `pdflatex`) for pixel-perfect 1-page PDFs.
+   - **Google Docs (`GD`):** Automatically creates a formatted Google Doc in Google Drive via Google Docs API, returning an instant 1-click edit link.
+
+```mermaid
+flowchart TD
+    JD["Target Job Description (URL, Text, or PDF)"] --> Extractor["Groq JD Feature & Keyword Extractor"]
+    
+    subgraph MasterData ["Master Knowledge Base"]
+        Profile["master_profile.json<br/>(All Projects, Roles, Skills, Education)"]
+    end
+    
+    Extractor --> TailorEngine["AI Tailoring & Synthesis Engine (Groq Llama 3.3 70B)"]
+    Profile --> TailorEngine
+    
+    TailorEngine -->|Synthesized Data| Generator["Dual Rendering Engines"]
+    
+    subgraph Generators ["Rendering Pipelines"]
+        Generator -->|Jinja2 + TeX| TexPipeline["LaTeX Engine (.tex)"]
+        TexPipeline -->|Tectonic / pdflatex| OutputPDF["Targeted PDF Resume (ATS-Ready)"]
+        
+        Generator -->|Google Docs & Drive API| GDPipeline["Google Docs Engine (GD)"]
+        GDPipeline --> OutputGD["Editable Google Doc in Drive"]
+    end
+    
+    OutputPDF --> Emailer["Job Agent Gmail API (Auto-attach)"]
+    OutputPDF --> UIPreview["React UI & WhatsApp Preview"]
+    OutputGD --> UIPreview
+```
+
+### 🧱 Planned Architecture & Modules
+- **`backend/data/master_profile.json`**: Master career database (truth source containing all verified roles, skills, projects, and achievements).
+- **`backend/templates/resume_template.tex`**: Production ATS LaTeX template (Jake's Resume / Modern Clean style).
+- **`backend/resume_tailor.py`**: Semantic JD keyword matching, STAR/XYZ bullet synthesis, and 1-page token budgeting.
+- **`backend/tex_generator.py`**: Jinja2 LaTeX templating, character escaping, and `tectonic` compilation.
+- **`backend/gdoc_generator.py`**: Google Docs API integration (`documents.create` + `batchUpdate` formatting) to output directly into Google Drive.
+- **`frontend/src/components/ResumeSelector.jsx`**: Toggle between *"Use Pre-made Resume"* and *"⚡ Build Custom AI Resume (LaTeX + GD)"*.
+
+### 🗓️ Implementation Phases
+- **Phase 1: Master Profile Schema & Parser** — Aggregate verified experience from existing resumes into structured JSON schema.
+- **Phase 2: AI Tailoring Pipeline** — Prompt engineering with Groq Llama 3.3 70B for keyword extraction and STAR bullet tailoring.
+- **Phase 3: LaTeX Engine (`.tex` $\rightarrow$ PDF)** — Jinja2 LaTeX generation and standalone compiler integration.
+- **Phase 4: Google Docs (`GD`) Automation** — Cloud doc generation via Google Docs & Drive API with shareable link.
+- **Phase 5: Full UI & WhatsApp Integration** — Frontend preview + WhatsApp bot command (`/custom` / `BUILD`).
+
+---
+
 ## 🛣️ Roadmap
 
 - [x] Link & Social Post Scraper (LinkedIn jobs, LinkedIn updates, Instagram posts)
 - [x] WhatsApp Bot application assistant via Twilio
 - [x] Cloud deployment configuration (`render.yaml` & headless Gmail auth)
+- [ ] **Autonomous Custom Resume Generator (LaTeX `.tex` + Google Docs `GD` via JD)**
 - [ ] Application tracker & status dashboard (database logging of sent emails)
 - [ ] Automated inbox polling to detect recruiter responses and interview invites
 - [ ] Browser extension for one-click job parsing directly on career portals
